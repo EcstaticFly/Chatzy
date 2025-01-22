@@ -1,10 +1,12 @@
 import express from "express";
-import authRoutes from "./routes/authRoutes.js";
 import dotenv, { configDotenv } from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "../server/configs/mongoDB.js";
 import connectCloudinary from "./configs/cloudinary.js";
+
+import authRoutes from "./routes/authRoutes.js";
+import messageRoutes from './routes/messageRoutes.js';
 
 dotenv.config({
   path: ".env",
@@ -32,6 +34,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/message", messageRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is now running on port ${PORT}`);
