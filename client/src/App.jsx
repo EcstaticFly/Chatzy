@@ -1,35 +1,49 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import Navbar from "./components/navbar";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import Home from "./pages/home";
+import RegisterPage from "./pages/register";
+import LoginPage from "./pages/login";
+import ProfilePage from "./pages/profile";
+import SettingsPage from "./pages/settings";
+import { authStore } from "./store/authStore";
+import { useEffect } from "react";
+import { LoaderCircle } from "lucide-react";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { user, checkAuth, isLoading } = authStore();
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  console.log(user, "user");
+
+  if (isLoading && !user) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <LoaderCircle className="size-10 mb-3 animate-spin" />
+        <h1 className="font-extralight tracking-wider">Please Wait...</h1>
+      </div>
+    );
+  }
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={user ? <Home /> : navigate("/login")} />
+        <Route
+          path="/register"
+          element={user ? navigate("/") : <RegisterPage />}
+        />
+        <Route path="/login" element={user ? navigate("/") : <LoginPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route
+          path="/profile"
+          element={user ? <ProfilePage /> : navigate("/login")}
+        />
+      </Routes>
     </>
-  )
+  );
 }
-
-export default App
+export default App;

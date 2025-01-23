@@ -4,8 +4,11 @@ import User from "../models/user.js";
 export const verifyjwt = async (req, res, next) => {
   try {
     const giventoken = req.cookies.token;
-    if (!giventoken)
+    if (!giventoken) {
+      // console.log("no token");
       return res.status(401).json({ message: "Please login to access this" });
+    }
+
     const decoded = jwt.verify(giventoken, process.env.JWT_SECRET);
     if (!decoded) {
       return res.status(401).json({ message: "Invalid token" });
