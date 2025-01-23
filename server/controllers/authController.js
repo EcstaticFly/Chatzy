@@ -1,7 +1,11 @@
 import { generateToken } from "../configs/utils.js";
 import User from "../models/user.js";
 import bcrypt from "bcryptjs";
+import randomstring from "randomstring";
+import nodemailer from "nodemailer";
 import { v2 as cloudinary } from "cloudinary";
+import dotenv, { config } from "dotenv";
+config();
 
 export const loginUser = async (req, res) => {
   try {
@@ -125,5 +129,86 @@ export const checkUser = (req, res) => {
     res.status(500).json({
       message: "Internal server error",
     });
+  }
+};
+
+const otpCache = {};
+
+function generateOtp() {
+  return randomstring.generate({ length: 6, charset: "numeric" });
+}
+
+async function sendOtp(email, otp) {
+  try {
+    const mailOptions = {
+      from: "otp.shopex@gmail.com",
+      to: email,
+      subject: "Otp verification",
+      text: `Your Shopex Otp for verification is ${otp}. DO NOT share it with anyone.`,
+    };
+    // console.log("h1");
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: "otp.shopex@gmail.com",
+        pass: process.env.SECRET_PASSWORD,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
+    });
+    // console.log("h2");
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) console.log("Error occured: ", error.message);
+      else console.log("OTP sent successfully: ", info.response);
+    });
+    // console.log("h3");
+    return true;
+  } catch (e) {
+    console.log("Otp sending fail.");
+    return false;
+  }
+}
+
+export const getOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const otp = generateOtp();
+    otpCache[email] = otp;
+
+    // console.log("email = ", req.body.email);
+
+    const result = await sendOtp(email, otp);
+    console.log(email, otp);
+    if (result) {
+      res.cookie("otpCache", otpCache, { maxAge: 30000, httpOnly: true });
+      res.status(200).json({ message: "OTP sent succesfully" });
+    } else {
+      res.status(400).json({ message: "Failed to send OTP." });
+    }
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const verifyOtp = async (req, res) => {
+  const { formData, givenOTP } = req.body;
+  const actualOTP = req.cookies.otpCache;
+  if (!actualOTP) {
+    return res.status(400).json({ message: "OTP expired." });
+  }
+  if (!actualOTP.hasOwnProperty(formData.email)) {
+    return res.status(400).json({ message: "Email not found,try again" });
+  }
+
+  if (actualOTP[formData.email] === givenOTP.trim()) {
+    delete otpCache[formData.email];
+    return res.status(200).json({ message: "OTP verified successfully" });
+  } else {
+    return res.status(400).json({ message: "Invalid OTP" });
   }
 };

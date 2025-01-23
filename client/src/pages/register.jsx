@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { authStore } from "../store/authStore";
 import { EyeOff, MessageSquare, Eye, Loader } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import AuthImagePattern from "../components/authImagePattern";
 import { toast } from 'react-hot-toast'
 
@@ -12,10 +12,42 @@ const initialState = {
   password: "",
 };
 export default function RegisterPage() {
-  const { register, isRegistering } = authStore();
+  const { register, sendOtp, isSendingOtp, verifyOtp } = authStore();
 
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState(initialState);
+
+  const inputRefs = useRef([]);
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace" && index > 0 && !otp[index]) {
+      inputRefs.current[index - 1].focus();
+    }
+  };
+
+
+  const handleInputChange = (e, index) => {
+    const { value } = e.target;
+    const newOtp = [...otp];
+    newOtp[index] = value.slice(0, 1);
+    setOtp(newOtp);
+    if (value && index < inputRefs.current.length - 1) {
+      inputRefs.current[index + 1].focus();
+    }
+  };
+
+  const handleOtpVerification = async () => {
+    const givenOTP = otp.join("");
+    const result = await verifyOtp(formData, givenOTP);
+    if (result.message === "OTP verified successfully") {
+      register(formData);
+    } else {
+      toast.error(result.message);
+    }
+    setOtp(["", "", "", "", "", ""])
+  }
 
   const isFormValid = async () => {
     if (!formData.fullName.trim()) {
@@ -42,12 +74,13 @@ export default function RegisterPage() {
     event.preventDefault();
     const isValid = await isFormValid();
     if (isValid) {
-      // console.log('haha')
-      register(formData);
+      document.getElementById('my_modal_1').showModal();
+      sendOtp(formData);
     }
   };
 
-  // console.log(formData, "formData");
+  console.log(formData, "formData");
+  console.log(otp);
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
@@ -141,12 +174,12 @@ export default function RegisterPage() {
             <button
               className="btn btn-outline w-full bg-primary"
               type="submit"
-              disabled={isRegistering}
+              disabled={isSendingOtp}
             >
-              {isRegistering ? (
+              {isSendingOtp ? (
                 <>
                   <Loader className="size-6 animate-spin" />
-                  <span className="font-semibold">Loading...</span>
+                  <span className="font-semibold">Sending OTP...</span>
                 </>
               ) : (
                 <span className=" text-black font-semibold">Register</span>
@@ -168,6 +201,43 @@ export default function RegisterPage() {
         title="Join our community"
         subtitle="Connect with friends, share moments, and stay in touch with your loved ones."
       />
+      <dialog id="my_modal_1" className="modal">
+        <div className=" flex items-center justify-center bg-gray-200">
+          <div className="w-full max-w-md p-6 rounded-lg bg-gray-300 shadow-md">
+            <p className="h-8 mx-10  bg-gray-400 mb-3">
+              <h3 className="text-center font-semibold text-gray-700 mb-4 mx-10 py-1">
+                VERIFY OTP
+              </h3>
+            </p>
+
+            <p className="text-center text-gray-800 mb-6">
+              Please enter the 6 digit OTP sent to your email ID
+            </p>
+            <form onSubmit={handleSubmit}>
+              <div className="flex justify-center gap-2 mb-6">
+                {[...Array(6)].map((_, index) => (
+                  <input
+                    key={index}
+                    type="text"
+                    maxLength="1"
+                    value={otp[index]}
+                    onChange={(e) => handleInputChange(e, index)}
+                    onKeyDown={(e) => handleKeyDown(e, index)}
+                    ref={(el) => (inputRefs.current[index] = el)}
+                    className="size-12 text-center text-black text-xl rounded bg-gray-100"
+                  />
+                ))}
+              </div>
+              <div className="modal-action">
+                <form method="dialog">
+                  <button className="btn mr-3 hover:bg-white hover:text-black" onClick={() => setOtp(["", "", "", "", "", ""])}>Close</button>
+                  <button className="btn hover:bg-white hover:text-black" type="submit" onClick={handleOtpVerification}>Proceed</button>
+                </form>
+              </div>
+            </form>
+          </div>
+        </div>
+      </dialog>
     </div>
   );
 }

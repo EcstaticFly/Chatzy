@@ -4,9 +4,9 @@ import toast from "react-hot-toast";
 export const authStore = create((set) => ({
     user: null,
     isLoggingIn: false,
-    isRegistering: false,
     isUpdating: false,
     isLoading: true,
+    isSendingOtp: false,
 
     checkAuth: async () => {
         try {
@@ -28,7 +28,7 @@ export const authStore = create((set) => ({
             set({ user: response.data });
         } catch (e) {
             console.log(e);
-            toast.error("Failed to create account");
+            toast.error(e.response.data.message);
         } finally {
             set({ isRegistering: false });
         }
@@ -58,6 +58,33 @@ export const authStore = create((set) => ({
             console.log(e);
             toast.error(e.response.data.message)
         }
+    },
+
+    sendOtp : async(formData)=>{
+        set({ isSendingOtp: true });
+        try {
+            const response = await axiosInstance.post("/auth/sendOtp", formData);
+            toast.success(response.data.message)
+        } catch (e) {
+            console.log(e);
+            toast.error(e.response.data.message);
+        } finally {
+            set({ isSendingOtp: false });
+        }
+    },
+    
+    verifyOtp: async(formData,givenOTP)=> {
+        set({isLoading:true});
+        try {
+            const response = await axiosInstance.post("/auth/verifyOtp", {formData,givenOTP});
+            return response.data;
+        } catch (e) {
+            console.log(e);
+            toast.error(e.response.data.message);
+        } finally {
+            set({ isLoading: false });
+        }
+
     }
 
 
