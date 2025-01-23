@@ -2,6 +2,6 @@
 
 export default function SettingsPage() {
   return (
-    <div>settings</div>
+    <div><h1 className="">settings</h1></div>
   )
 }

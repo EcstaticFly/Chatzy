@@ -121,7 +121,7 @@ export const checkUser = (req, res) => {
   try {
     res.status(200).json(req.user);
   } catch (e) {
-    console.log("Error in checkUser controller", e.message);
+    console.log(e);
     res.status(500).json({
       message: "Internal server error",
     });
