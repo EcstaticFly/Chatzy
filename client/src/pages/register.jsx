@@ -49,6 +49,18 @@ export default function RegisterPage() {
     setOtp(["", "", "", "", "", ""])
   }
 
+  function validateEmailDomain(email) {
+
+    const gmailRegex = /^[^@]+@gmail\.com$/;
+
+    const yahooRegex = /^[^@]+@yahoo\.com$/;
+
+    const iiitRanchiRegex = /^[^@]+@iiitranchi\.ac\.in$/;
+
+    return gmailRegex.test(email) || yahooRegex.test(email) || iiitRanchiRegex.test(email);
+
+}
+
   const isFormValid = async () => {
     if (!formData.fullName.trim()) {
       toast.error("Please enter full name");
@@ -66,6 +78,10 @@ export default function RegisterPage() {
       toast.error("Password must have at least 6 characters");
       return false;
     }
+    if(!validateEmailDomain(formData.email)){
+      toast.error("Only Gmail, yahoo and iiitranchi emails allowed");
+      return false;
+    }
 
     return true;
   };
@@ -74,8 +90,8 @@ export default function RegisterPage() {
     event.preventDefault();
     const isValid = await isFormValid();
     if (isValid) {
+      await sendOtp(formData);
       document.getElementById('my_modal_1').showModal();
-      sendOtp(formData);
     }
   };
 

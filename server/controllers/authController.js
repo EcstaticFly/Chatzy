@@ -175,14 +175,12 @@ export const getOtp = async (req, res) => {
   try {
     const { email } = req.body;
     const otp = generateOtp();
-    otpCache[email] = otp;
-
-    // console.log("email = ", req.body.email);
+    otpCache[email] = await bcrypt.hash(otp, 12);
 
     const result = await sendOtp(email, otp);
-    console.log(email, otp);
+    // console.log(email, otp);
     if (result) {
-      res.cookie("otpCache", otpCache, { maxAge: 30000, httpOnly: true });
+      res.cookie("otpCache", otpCache, { maxAge: 300000, httpOnly: true, secure : false });
       res.status(200).json({ message: "OTP sent succesfully" });
     } else {
       res.status(400).json({ message: "Failed to send OTP." });
@@ -197,15 +195,16 @@ export const getOtp = async (req, res) => {
 
 export const verifyOtp = async (req, res) => {
   const { formData, givenOTP } = req.body;
-  const actualOTP = req.cookies.otpCache;
-  if (!actualOTP) {
+  const actualOTPCache = req.cookies.otpCache;
+  const decodedOtp = await bcrypt.compare(givenOTP.trim(),actualOTPCache[formData.email]);
+  if (!actualOTPCache) {
     return res.status(400).json({ message: "OTP expired." });
   }
-  if (!actualOTP.hasOwnProperty(formData.email)) {
+  if (!actualOTPCache.hasOwnProperty(formData.email)) {
     return res.status(400).json({ message: "Email not found,try again" });
   }
 
-  if (actualOTP[formData.email] === givenOTP.trim()) {
+  if (decodedOtp) {
     delete otpCache[formData.email];
     return res.status(200).json({ message: "OTP verified successfully" });
   } else {
