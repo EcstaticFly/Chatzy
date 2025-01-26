@@ -13,7 +13,7 @@ function App() {
   const { user, checkAuth, isLoading } = authStore();
 
   useEffect(() => {
-    checkAuth();
+     checkAuth();
   }, [checkAuth]);
 
   // console.log(user, "user");
@@ -38,7 +38,7 @@ function App() {
           path="/profile"
           element={user ? <ProfilePage /> : <Navigate to="/register" />}
         />
-        <Route path="*" element={<h1 className="text-5xl font-extrabold">Oops!...Page Not found.</h1>} />
+        <Route path="*" element={<h1 className="text-5xl font-extrabold mt-52">Oops!...Page Not found.</h1>} />
       </Routes>
     </>
   );

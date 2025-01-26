@@ -7,6 +7,7 @@ import {
   checkUser,
   getOtp,
   verifyOtp,
+  deleteProfilePic
 } from "../controllers/authController.js";
 import { verifyjwt } from "../middlewares/checkAuth.js";
 const router = express.Router();
@@ -18,5 +19,6 @@ router.put("/update", verifyjwt, updateProfilePic);
 router.get("/check", verifyjwt, checkUser);
 router.post("/sendOtp", getOtp);
 router.post("/verifyOtp", verifyOtp);
+router.delete("/deleteImage",verifyjwt, deleteProfilePic);
 
 export default router;

@@ -6,6 +6,7 @@ export const authStore = create((set) => ({
     isLoggingIn: false,
     isUpdating: false,
     isLoading: true,
+    isDeletingImage :false,
     isSendingOtp: false,
 
     checkAuth: async () => {
@@ -57,6 +58,37 @@ export const authStore = create((set) => ({
         } catch (e) {
             console.log(e);
             toast.error(e.response.data.message)
+        }
+    },
+
+    updateProfile: async(profilePic)=>{
+        set({ isUpdating: true });
+        try {
+            const response = await axiosInstance.put("/auth/update", profilePic);
+            console.log(response.data);
+            set({ user: response.data.user });
+            toast.success(response.data.message);
+        } catch (e) {
+            console.log(e);
+            toast.error(e.response.data.message);
+        } finally {
+            set({ isUpdating: false });
+        }
+
+    },
+
+    deleteProfilePic: async()=>{
+        set({ isDeletingImage: true });
+        try {
+            const response = await axiosInstance.delete("/auth/deleteImage");
+            // console.log(response.data);
+            set({ user: response.data.user });
+            toast.success(response.data.message);
+        } catch (e) {
+            console.log(e);
+            toast.error(e.response.data.message);
+        } finally {
+            set({ isDeletingImage: false });
         }
     },
 

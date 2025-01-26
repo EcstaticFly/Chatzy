@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import randomstring from "randomstring";
 import nodemailer from "nodemailer";
 import { v2 as cloudinary } from "cloudinary";
+import { extractPublicId } from "cloudinary-build-url";
 import dotenv, { config } from "dotenv";
 config();
 
@@ -112,11 +113,39 @@ export const updateProfilePic = async (req, res) => {
       { new: true }
     );
     await user.save();
-    res.status(200).json(user);
+    res
+      .status(200)
+      .json({ user, message: "Profile Picture Updated Successfully!" });
   } catch (e) {
     console.log(e.message);
     res.status(500).json({
       message: "Internal server error",
+    });
+  }
+};
+
+export const deleteProfilePic = async (req, res) => {
+  try {
+    if(!req.user.profilePic){
+      return res.status(400).json({ message: "No profile picture to delete" });
+    }
+    const publicId = extractPublicId(req.user.profilePic);
+    // console.log(publicId);
+    const result = await cloudinary.uploader.destroy(publicId);
+    const userId = req.user._id;
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { profilePic: "" },
+      { new: true }
+    );
+    await user.save();
+    res
+      .status(200)
+      .json({ user, message: "Profile Picture Deleted Successfully!" });
+  } catch (e) {
+    console.log(e.message);
+    res.status(500).json({
+      message: "Some error occured, picture not deleted.",
     });
   }
 };
@@ -175,12 +204,16 @@ export const getOtp = async (req, res) => {
   try {
     const { email } = req.body;
     const otp = generateOtp();
-    otpCache[email] = await bcrypt.hash(otp, 12);
+    otpCache[email] = await bcrypt.hash(otp, 10);
 
     const result = await sendOtp(email, otp);
     // console.log(email, otp);
     if (result) {
-      res.cookie("otpCache", otpCache, { maxAge: 300000, httpOnly: true, secure : false });
+      res.cookie("otpCache", otpCache, {
+        maxAge: 300000,
+        httpOnly: true,
+        secure: false,
+      });
       res.status(200).json({ message: "OTP sent succesfully" });
     } else {
       res.status(400).json({ message: "Failed to send OTP." });
@@ -196,7 +229,10 @@ export const getOtp = async (req, res) => {
 export const verifyOtp = async (req, res) => {
   const { formData, givenOTP } = req.body;
   const actualOTPCache = req.cookies.otpCache;
-  const decodedOtp = await bcrypt.compare(givenOTP.trim(),actualOTPCache[formData.email]);
+  const decodedOtp = await bcrypt.compare(
+    givenOTP.trim(),
+    actualOTPCache[formData.email]
+  );
   if (!actualOTPCache) {
     return res.status(400).json({ message: "OTP expired." });
   }

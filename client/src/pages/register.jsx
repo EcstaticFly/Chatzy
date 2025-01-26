@@ -95,8 +95,7 @@ export default function RegisterPage() {
     }
   };
 
-  console.log(formData, "formData");
-  console.log(otp);
+  // console.log(formData, "formData");
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
@@ -104,7 +103,7 @@ export default function RegisterPage() {
         <div className="w-full max-w-md space-y-8">
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2 group">
-              <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 ">
                 <MessageSquare className="size-6 text-primary" />
               </div>
               <h1 className="text-2xl font-bold mt-2">Create Account</h1>
@@ -244,6 +243,9 @@ export default function RegisterPage() {
                   />
                 ))}
               </div>
+              <p className="text-center text-gray-800 mb-6">
+              Valid for 5 mins only.
+            </p>
               <div className="modal-action">
                 <form method="dialog">
                   <button className="btn mr-3 hover:bg-white hover:text-black" onClick={() => setOtp(["", "", "", "", "", ""])}>Close</button>
