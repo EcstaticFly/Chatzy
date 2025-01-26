@@ -6,8 +6,9 @@ export const authStore = create((set) => ({
     isLoggingIn: false,
     isUpdating: false,
     isLoading: true,
-    isDeletingImage :false,
+    isDeletingImage: false,
     isSendingOtp: false,
+    onlineUsers: [],
 
     checkAuth: async () => {
         try {
@@ -54,14 +55,13 @@ export const authStore = create((set) => ({
             await axiosInstance.post("/auth/logout");
             toast.success("Logged out successfully!");
             set({ user: null });
-
         } catch (e) {
             console.log(e);
-            toast.error(e.response.data.message)
+            toast.error(e.response.data.message);
         }
     },
 
-    updateProfile: async(profilePic)=>{
+    updateProfile: async (profilePic) => {
         set({ isUpdating: true });
         try {
             const response = await axiosInstance.put("/auth/update", profilePic);
@@ -74,10 +74,9 @@ export const authStore = create((set) => ({
         } finally {
             set({ isUpdating: false });
         }
-
     },
 
-    deleteProfilePic: async()=>{
+    deleteProfilePic: async () => {
         set({ isDeletingImage: true });
         try {
             const response = await axiosInstance.delete("/auth/deleteImage");
@@ -92,11 +91,11 @@ export const authStore = create((set) => ({
         }
     },
 
-    sendOtp : async(formData)=>{
+    sendOtp: async (formData) => {
         set({ isSendingOtp: true });
         try {
             const response = await axiosInstance.post("/auth/sendOtp", formData);
-            toast.success(response.data.message)
+            toast.success(response.data.message);
         } catch (e) {
             console.log(e);
             toast.error(e.response.data.message);
@@ -104,11 +103,14 @@ export const authStore = create((set) => ({
             set({ isSendingOtp: false });
         }
     },
-    
-    verifyOtp: async(formData,givenOTP)=> {
-        set({isLoading:true});
+
+    verifyOtp: async (formData, givenOTP) => {
+        set({ isLoading: true });
         try {
-            const response = await axiosInstance.post("/auth/verifyOtp", {formData,givenOTP});
+            const response = await axiosInstance.post("/auth/verifyOtp", {
+                formData,
+                givenOTP,
+            });
             return response.data;
         } catch (e) {
             console.log(e);
@@ -116,8 +118,5 @@ export const authStore = create((set) => ({
         } finally {
             set({ isLoading: false });
         }
-
-    }
-
-
+    },
 }));
