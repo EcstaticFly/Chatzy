@@ -92,7 +92,7 @@ export default function LoginPage() {
               </button>
             </label>
             <button
-              className="btn btn-outline w-full bg-primary"
+              className="btn btn-primary w-full"
               type="submit"
               disabled={isLoggingIn}
             >
@@ -102,7 +102,7 @@ export default function LoginPage() {
                   <span className="font-semibold">Loading...</span>
                 </>
               ) : (
-                <span className=" text-black font-semibold">Login</span>
+                "Login"
               )}
             </button>
           </form>
@@ -118,8 +118,8 @@ export default function LoginPage() {
       </div>
 
       <AuthImagePattern
-        title="Join our community"
-        subtitle="Connect with friends, share moments, and stay in touch with your loved ones."
+        title="Pleased to see you!"
+        subtitle="Login back to continue your conversations and catch up with friends."
       />
     </div>
   )

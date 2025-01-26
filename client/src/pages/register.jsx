@@ -187,7 +187,7 @@ export default function RegisterPage() {
               </button>
             </label>
             <button
-              className="btn btn-outline w-full bg-primary"
+              className="btn btn-primary w-full"
               type="submit"
               disabled={isSendingOtp}
             >
@@ -197,7 +197,7 @@ export default function RegisterPage() {
                   <span className="font-semibold">Sending OTP...</span>
                 </>
               ) : (
-                <span className=" text-black font-semibold">Register</span>
+                "Register"
               )}
             </button>
           </form>

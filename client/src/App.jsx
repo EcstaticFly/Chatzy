@@ -1,17 +1,18 @@
-import Navbar from "./components/navbar";
+import Navbar from "./components/navbar.jsx";
 import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
-import RegisterPage from "./pages/register";
-import LoginPage from "./pages/login";
-import ProfilePage from "./pages/profile";
-import SettingsPage from "./pages/settings";
-import { authStore } from "./store/authStore";
+import RegisterPage from "./pages/register.jsx";
+import LoginPage from "./pages/login.jsx";
+import ProfilePage from "./pages/profile.jsx";
+import SettingsPage from "./pages/settings.jsx";
+import { authStore } from "./store/authStore.js";
 import { useEffect } from "react";
 import { LoaderCircle } from "lucide-react";
-import HomePage from "./pages/home";
+import HomePage from "./pages/home.jsx";
+import { themeStore } from "./store/themeStore.js";
 
 function App() {
   const { user, checkAuth, isLoading } = authStore();
-
+  const {theme} = themeStore();
   useEffect(() => {
      checkAuth();
   }, [checkAuth]);
@@ -27,7 +28,7 @@ function App() {
     );
   }
   return (
-    <>
+    <div data-theme={theme}>
       <Navbar />
       <Routes>
         <Route path="/" element={user ? <HomePage /> : <Navigate to="/register" />} />
@@ -40,7 +41,7 @@ function App() {
         />
         <Route path="*" element={<h1 className="text-5xl font-extrabold mt-52">Oops!...Page Not found.</h1>} />
       </Routes>
-    </>
+    </div>
   );
 }
 export default App;
