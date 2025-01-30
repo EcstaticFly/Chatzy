@@ -1,12 +1,14 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { chatStore } from "../store/chatStore.js";
 import { ChatHeader } from "./chatHeader.jsx";
 import { MessageInput } from "./messageInput.jsx";
 import { MessageSkeleton } from "./skeletons/messageSkeleton.jsx";
 import { authStore } from "../store/authStore.js";
 import { formatMessageTime } from "../configs/utils.js";
+import { X } from "lucide-react";
 
 export default function ChatContainer() {
+  const [openFullScreenImage, setOpenFullScreenImage] = useState(false);
   const {
     getMessages,
     selectedUser,
@@ -82,8 +84,27 @@ export default function ChatContainer() {
                   src={message?.image}
                   alt="Attachment"
                   className="sm:max-w-[200px] rounded-md mb-2"
+                  onClick={() => setOpenFullScreenImage(true)}
                 />
               )}
+
+              {openFullScreenImage && (
+                <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50">
+                  <button
+                    className="absolute top-5 right-5 text-white text-3xl p-2 rounded-full bg-gray-700 hover:bg-red-600 transition"
+                    onClick={() => setOpenFullScreenImage(false)}
+                  >
+                    <X size={32} />
+                  </button>
+
+                  <img
+                    src={message?.image}
+                    alt="Full Screen"
+                    className="max-w-full max-h-full rounded-lg shadow-lg"
+                  />
+                </div>
+              )}
+
               {message.text && <p>{message.text}</p>}
             </div>
           </div>

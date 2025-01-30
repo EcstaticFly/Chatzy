@@ -179,7 +179,7 @@ async function sendOtp(email, otp) {
     const transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
-        user: "otp.shopex@gmail.com",
+        user: process.env.MAIL_USER,
         pass: process.env.SECRET_PASSWORD,
       },
       tls: {
