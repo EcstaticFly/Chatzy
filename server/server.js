@@ -6,13 +6,13 @@ import connectDB from "../server/configs/mongoDB.js";
 import connectCloudinary from "./configs/cloudinary.js";
 
 import authRoutes from "./routes/authRoutes.js";
-import messageRoutes from './routes/messageRoutes.js';
+import messageRoutes from "./routes/messageRoutes.js";
+import { app, server } from "./configs/socket.js";
 
 dotenv.config({
   path: ".env",
 });
 
-const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(
@@ -31,12 +31,13 @@ app.use(
 );
 
 app.use(cookieParser());
-app.use(express.json());
+app.use(express.json({limit:"5mb"}));
+app.use(express.urlencoded({limit:"5mb", extended:true}));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is now running on port ${PORT}`);
   connectDB();
   connectCloudinary();

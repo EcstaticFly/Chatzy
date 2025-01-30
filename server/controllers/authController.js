@@ -71,7 +71,7 @@ export const registerUser = async (req, res) => {
         email: newUser.email,
         fullName: newUser.fullName,
         profilePic: newUser.profilePic,
-        message: "User created successfully",
+        message: "Account created successfully",
       });
     } else {
       return res.status(400).json({ message: "Invalid user data" });
