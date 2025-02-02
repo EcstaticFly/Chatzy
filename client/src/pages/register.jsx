@@ -143,7 +143,7 @@ export default function RegisterPage() {
                 <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
               </svg>
               <input
-                type="text"
+                type="email"
                 className="grow"
                 placeholder="Email"
                 value={formData.email}
@@ -217,10 +217,10 @@ export default function RegisterPage() {
         subtitle="Connect with friends, share moments, and stay in touch with your loved ones."
       />
       <dialog id="my_modal_1" className="modal">
-        <div className=" flex items-center justify-center bg-gray-200">
+        <div className=" flex items-center justify-center bg-gray-200 rounded-lg">
           <div className="w-full max-w-md p-6 rounded-lg bg-gray-300 shadow-md">
-            <p className="h-8 mx-10  bg-gray-400 mb-3">
-              <h3 className="text-center font-semibold text-gray-700 mb-4 mx-10 py-1">
+            <p className="h-8 mx-10  bg-gray-400 mb-3 rounded-lg">
+              <h3 className="text-center font-extrabold text-gray-700 mb-4 mx-10 py-1">
                 VERIFY OTP
               </h3>
             </p>
@@ -228,7 +228,7 @@ export default function RegisterPage() {
             <p className="text-center text-gray-800 mb-6">
               Please enter the 6 digit OTP sent to your email ID
             </p>
-            <form onSubmit={handleSubmit}>
+            <form>
               <div className="flex justify-center gap-2 mb-6">
                 {[...Array(6)].map((_, index) => (
                   <input
@@ -244,12 +244,12 @@ export default function RegisterPage() {
                 ))}
               </div>
               <p className="text-center text-gray-800 mb-6">
-              Valid for 5 mins only.
+              Valid for 5 mins only
             </p>
               <div className="modal-action">
                 <form method="dialog">
-                  <button className="btn mr-3 hover:bg-white hover:text-black" onClick={() => setOtp(["", "", "", "", "", ""])}>Close</button>
-                  <button className="btn hover:bg-white hover:text-black" type="submit" onClick={handleOtpVerification}>Proceed</button>
+                  <button className="btn mr-3 btn-error" onClick={() => setOtp(["", "", "", "", "", ""])}>Close</button>
+                  <button className="btn btn-success" onClick={handleOtpVerification}>Proceed</button>
                 </form>
               </div>
             </form>

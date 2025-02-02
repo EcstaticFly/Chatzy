@@ -242,7 +242,7 @@ export const verifyOtp = async (req, res) => {
 
   if (decodedOtp) {
     delete otpCache[formData.email];
-    return res.status(200).json({ message: "OTP verified successfully" });
+    return res.status(200).clearCookie("otpCache").json({ message: "OTP verified successfully" });
   } else {
     return res.status(400).json({ message: "Invalid OTP" });
   }

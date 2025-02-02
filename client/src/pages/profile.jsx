@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { authStore } from "../store/authStore";
-import { Camera, Mail, User, Trash2 } from "lucide-react";
+import { Camera, Mail, User, Trash2, X } from "lucide-react";
 
 export default function ProfilePage() {
-  const { updateProfile, isUpdating, user, deleteProfilePic, isDeletingImage } = authStore();
+  const [openFullScreenImage, setOpenFullScreenImage] = useState(false);
+  const { updateProfile, isUpdating, user, deleteProfilePic, isDeletingImage } =
+    authStore();
   const [selectedImage, setSelectedImage] = useState(null);
 
   const handleImageUpload = async (event) => {
@@ -20,10 +22,9 @@ export default function ProfilePage() {
     };
   };
 
-  const handleDeletImage = async()=>{
+  const handleDeleteImage = async () => {
     await deleteProfilePic();
-  }
-
+  };
 
   return (
     <div className="h-screen pt-20">
@@ -47,7 +48,9 @@ export default function ProfilePage() {
               >
                 <button
                   className="rounded-full items-center flex p-1"
-                  onClick={()=>document.getElementById('my_modal_1').showModal()}
+                  onClick={() =>
+                    document.getElementById("my_modal_1").showModal()
+                  }
                 >
                   <Trash2 className=" text-black object-cover size-5 bg-red-400" />
                 </button>
@@ -56,7 +59,8 @@ export default function ProfilePage() {
               <img
                 src={selectedImage || user?.profilePic || "/avatar.png"}
                 alt="Profile"
-                className="size-32 rounded-full object-cover border-4 "
+                className="size-32 rounded-full object-cover border-4 cursor-pointer "
+                onClick={() => setOpenFullScreenImage(true)}
               />
               <label
                 htmlFor="avatar-upload"
@@ -123,26 +127,52 @@ export default function ProfilePage() {
             </div>
 
             <dialog id="my_modal_1" className="modal">
-            <div className=" flex items-center justify-center bg-gray-200">
-          <div className="w-full max-w-md p-6 rounded-lg bg-gray-300 shadow-md">
-            <p className="h-8 mx-10  bg-gray-400 mb-3">
-              <h3 className="text-center font-semibold text-black mb-4 mx-10 py-1">
-                Delete Profile Picture?
-              </h3>
-              </p>
-              <p className="text-black">This will delete the profile picture permanently.</p>
-              <div className="modal-action">
-                <form method="dialog">
-                  <button className="btn mr-3 hover:bg-white hover:text-black">Close</button>
-                  <button className="btn bg-red-500 font-extrabold tracking-wider text-white hover:bg-white hover:text-black" type="submit" onClick={handleDeletImage} >Proceed</button>
-                </form>
-              </div>
-              </div>
+              <div className=" flex items-center justify-center bg-gray-200 rounded-lg">
+                <div className="w-full max-w-md p-6 rounded-lg bg-gray-300 shadow-md">
+                  <p className="h-8 mx-10  bg-gray-400 mb-3 rounded-lg">
+                    <h3 className="text-center font-semibold text-black mb-4 mx-10 py-1">
+                      Delete Profile Picture?
+                    </h3>
+                  </p>
+                  <p className="text-black">
+                    This will delete the profile picture permanently.
+                  </p>
+                  <div className="modal-action">
+                    <form method="dialog">
+                      <button className="btn mr-3 btn-outline text-black">
+                        Close
+                      </button>
+                      <button
+                        className="btn font-bold  btn-error"
+                        type="submit"
+                        onClick={handleDeleteImage}
+                      >
+                        Proceed
+                      </button>
+                    </form>
+                  </div>
+                </div>
               </div>
             </dialog>
           </div>
         </div>
       </div>
+      {openFullScreenImage && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50">
+          <button
+            className="absolute top-5 right-5 text-white text-3xl p-2 rounded-full bg-gray-700 hover:bg-red-600 transition"
+            onClick={() => setOpenFullScreenImage(false)}
+          >
+            <X size={32} />
+          </button>
+
+          <img
+            src={selectedImage || user?.profilePic || "/avatar.png"}
+            alt="Full Screen"
+            className="max-w-full max-h-full rounded-lg shadow-lg"
+          />
+        </div>
+      )}
     </div>
   );
 }

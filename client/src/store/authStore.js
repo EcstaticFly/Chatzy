@@ -82,7 +82,7 @@ export const authStore = create((set, get) => ({
       toast.success(response.data.message);
     } catch (e) {
       console.log(e);
-      toast.error(e.response.data.message);
+      toast.error(e.response.data.message || "File size should be less than 5mb");
     } finally {
       set({ isUpdating: false });
     }
@@ -123,6 +123,7 @@ export const authStore = create((set, get) => ({
         formData,
         givenOTP,
       });
+      toast.success(response.data.message);
       return response.data;
     } catch (e) {
       console.log(e);

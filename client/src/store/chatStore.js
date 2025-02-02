@@ -9,6 +9,7 @@ export const chatStore = create((set, get) => ({
   selectedUser: null,
   isUsersLoading: false,
   isChatLoading: false,
+  isSendingMessage: false,
 
   setSelectedUser: (user) => {
     // if(!user) return;
@@ -42,6 +43,7 @@ export const chatStore = create((set, get) => ({
   },
 
   sendMessage: async (messageData) => {
+    set({ isSendingMessage: true });
     const { selectedUser, messages } = get();
     try {
       const response = await axiosInstance.post(
@@ -55,6 +57,7 @@ export const chatStore = create((set, get) => ({
         e.response.data.message || "File size should be less than 5mb"
       );
     } finally {
+      set({ isSendingMessage: false });
     }
   },
 

@@ -83,7 +83,7 @@ export default function ChatContainer() {
                 <img
                   src={message?.image}
                   alt="Attachment"
-                  className="sm:max-w-[200px] rounded-md mb-2"
+                  className="sm:max-w-[200px] rounded-md mb-2 cursor-pointer"
                   onClick={() => setOpenFullScreenImage(true)}
                 />
               )}
