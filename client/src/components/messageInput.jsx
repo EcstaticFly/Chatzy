@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { chatStore } from "../store/chatStore";
 import { X, Image, Send, Loader } from "lucide-react";
-import toast from "react-hot-toast";
+import {toast} from "react-toastify";
 
 export const MessageInput = () => {
   const { sendMessage ,isSendingMessage } = chatStore();

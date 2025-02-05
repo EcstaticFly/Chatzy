@@ -2,7 +2,7 @@ import express from "express";
 import dotenv, { configDotenv } from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import connectDB from "../server/configs/mongoDB.js";
+import connectDB from './configs/mongoDB.js'
 import connectCloudinary from "./configs/cloudinary.js";
 
 import authRoutes from "./routes/authRoutes.js";

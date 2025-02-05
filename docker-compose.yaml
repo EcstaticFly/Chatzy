@@ -1,0 +1,37 @@
+services:
+  server:
+    build: ./server
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./server/.env
+    networks:
+      - chatzy-network
+    depends_on:
+      - database
+
+  client:
+    build: ./client
+    ports:
+      - "5173:5173"
+    networks:
+      - chatzy-network
+
+  database:
+    image: mongo:8.0.3
+    ports:
+      - "27017:27017"
+    env_file:
+      - ./server/.env
+    networks:
+      - chatzy-network
+    volumes:
+      - mongo-data:/data/database
+
+networks:
+  chatzy-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local

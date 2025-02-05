@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { axiosInstance } from "../configs/axios.js";
-import toast from "react-hot-toast";
+import {toast} from "react-toastify";
 import { io } from "socket.io-client";
 
 const BASE_URL = "http://localhost:5000";
@@ -62,8 +62,8 @@ export const authStore = create((set, get) => ({
 
   logout: async () => {
     try {
-      await axiosInstance.post("/auth/logout");
-      toast.success("Logged out successfully!");
+      const response = await axiosInstance.post("/auth/logout");
+      toast.success(response.data.message);
       set({ user: null });
 
       get().disconnectSocket();

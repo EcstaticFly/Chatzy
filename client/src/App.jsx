@@ -11,7 +11,7 @@ import HomePage from "./pages/home.jsx";
 import { themeStore } from "./store/themeStore.js";
 
 function App() {
-  const { user, checkAuth, isLoading, onlineUsers } = authStore();
+  const { user, checkAuth, isLoading } = authStore();
   const {theme} = themeStore();
   useEffect(() => {
      checkAuth();

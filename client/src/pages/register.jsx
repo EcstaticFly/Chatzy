@@ -3,7 +3,7 @@ import { authStore } from "../store/authStore";
 import { EyeOff, MessageSquare, Eye, Loader } from "lucide-react";
 import { Link, Navigate } from "react-router-dom";
 import AuthImagePattern from "../components/authImagePattern";
-import { toast } from 'react-hot-toast'
+import { toast } from 'react-toastify'
 
 
 const initialState = {
