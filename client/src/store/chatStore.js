@@ -10,10 +10,32 @@ export const chatStore = create((set, get) => ({
   isUsersLoading: false,
   isChatLoading: false,
   isSendingMessage: false,
+  searchResults: [],
+  isSearchingUser: false,
 
   setSelectedUser: (user) => {
     // if(!user) return;
     set({ selectedUser: user });
+  },
+
+  getSearchResults: async (keyword) => {
+    // console.log("called");
+    set({ isSearchingUser: true });
+    try {
+      const response = await axiosInstance.get(
+        `/messages/searchUsers?search=${keyword}`
+      );
+      set({ searchResults: response.data });
+    } catch (e) {
+      console.log(e);
+      toast.error(e.response.data.message);
+    } finally {
+      set({ isSearchingUser: false });
+    }
+  },
+
+  resetSearchResults: async () => {
+    set({ searchResults: [] });
   },
 
   getUsers: async () => {
@@ -45,6 +67,7 @@ export const chatStore = create((set, get) => ({
   sendMessage: async (messageData) => {
     set({ isSendingMessage: true });
     const { selectedUser, messages } = get();
+    // console.log(selectedUser);
     try {
       const response = await axiosInstance.post(
         `/messages/send/${selectedUser._id}`,

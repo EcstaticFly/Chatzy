@@ -5,6 +5,7 @@ import {toast} from "react-toastify";
 
 export const MessageInput = () => {
   const { sendMessage ,isSendingMessage } = chatStore();
+  const {selectedUser} = chatStore(); 
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
@@ -73,21 +74,26 @@ export const MessageInput = () => {
             onChange={(event) => setText(event.target.value)}
           />
           <input
-            type="file"
-            className="hidden"
-            accept="image/*"
-            ref={fileInputRef}
-            onChange={handleImageChange}
-          />
-          <button
-            type="button"
-            className={`hidden sm:flex btn btn-circle ${
-              imagePreview ? "text-emerald-500" : "text-zinc-400"
-            }`}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Image size={20} />
-          </button>
+              type="file"
+              className="hidden"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleImageChange}
+            />
+          {
+            selectedUser._id !== "67a5af796174659ba813c735"
+            ? (
+            <button
+              type="button"
+              className={`hidden sm:flex btn btn-circle ${
+                imagePreview ? "text-emerald-500" : "text-zinc-400"
+              }`}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Image size={20} />
+            </button> 
+            ) : null
+          }
         </div>
         <button
           type="submit"

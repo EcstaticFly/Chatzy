@@ -13,6 +13,7 @@
   "author": "Suyash Pandey",
   "license": "ISC",
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.5.1",
     "cloudinary-build-url": "^0.2.4",

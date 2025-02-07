@@ -1,4 +1,4 @@
-import { generateToken } from "../configs/utils.js";
+import { generateChatbotToken, generateToken } from "../configs/utils.js";
 import User from "../models/user.js";
 import bcrypt from "bcryptjs";
 import randomstring from "randomstring";
@@ -17,21 +17,26 @@ export const loginUser = async (req, res) => {
         .json({ message: "Please provide both email and password" });
     }
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: "Invalid Credentials" });
-    }
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid Credentials" });
-    }
-    await generateToken(user._id, res);
-    res.status(201).json({
-      _id: user._id,
-      email: user.email,
-      fullName: user.fullName,
-      profilePic: user.profilePic,
-      message: "Logged in successfully",
-    });
+      if (!user) {
+        return res.status(400).json({ message: "Invalid Credentials" });
+      }
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: "Invalid Credentials" });
+      }
+      if (email.trim() === "suyash.2023ug1100@iiitranchi.ac.in") {
+        await generateChatbotToken(user._id, res);
+      } else {
+        await generateToken(user._id, res);
+      }
+      res.status(201).json({
+        _id: user._id,
+        email: user.email,
+        fullName: user.fullName,
+        profilePic: user.profilePic,
+        message: "Logged in successfully",
+      });
+    
   } catch (e) {
     console.log(e.message);
     res.status(500).json({
@@ -126,7 +131,7 @@ export const updateProfilePic = async (req, res) => {
 
 export const deleteProfilePic = async (req, res) => {
   try {
-    if(!req.user.profilePic){
+    if (!req.user.profilePic) {
       return res.status(400).json({ message: "No profile picture to delete" });
     }
     const publicId = extractPublicId(req.user.profilePic);
@@ -242,7 +247,10 @@ export const verifyOtp = async (req, res) => {
 
   if (decodedOtp) {
     delete otpCache[formData.email];
-    return res.status(200).clearCookie("otpCache").json({ message: "OTP verified successfully" });
+    return res
+      .status(200)
+      .clearCookie("otpCache")
+      .json({ message: "OTP verified successfully" });
   } else {
     return res.status(400).json({ message: "Invalid OTP" });
   }

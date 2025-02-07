@@ -2,6 +2,9 @@ import { getReceiverSocketId, io } from "../configs/socket.js";
 import Message from "../models/message.js";
 import User from "../models/user.js";
 import { v2 as cloudinary } from "cloudinary";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { config } from "dotenv";
+config();
 
 export const getUsers = async (req, res) => {
   try {
@@ -13,6 +16,34 @@ export const getUsers = async (req, res) => {
   } catch (e) {
     console.log(e.message);
     res.status(500).json({ message: "Failed to fetch users" });
+  }
+};
+
+export const searchUser = async (req, res) => {
+  try {
+    const keyword = req.query.search
+      ? {
+          $or: [
+            { name: { $regex: req.query.search, $options: "i" } },
+            { email: { $regex: req.query.search, $options: "i" } },
+          ],
+        }
+      : {};
+    try {
+      const users = await User.find(keyword)
+        .find({ _id: { $ne: req.user._id } })
+        .select("-password");
+      if (!users) {
+        return res.status(404).json({ message: "No user found" });
+      }
+      res.status(200).json(users);
+    } catch (e) {
+      console.log(e.message);
+      res.status(500).json({ message: "Failed to search user" });
+    }
+  } catch (e) {
+    console.log(e.message);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -38,6 +69,7 @@ export const sendMessage = async (req, res) => {
   try {
     const { text, image } = req.body;
     const { id: receiverId } = req.params;
+    // console.log(receiverId);
     const senderId = req.user._id;
     let imageUrl;
     if (image) {
@@ -57,10 +89,58 @@ export const sendMessage = async (req, res) => {
     if (receiverId) {
       io.to(receiverSocketId).emit("newMessage", message);
     }
-
+    // console.log("here");
     res.status(201).json(message);
+    if (receiverId === "67a5af796174659ba813c735") {
+      // console.log("here2");
+      setTimeout(() => {
+        sendChatBotMessage({
+          originalSenderId: senderId,
+          prompt: text,
+          imageUrl: imageUrl || null,
+        });
+      }, 0);
+    }
   } catch (e) {
     console.log(e.message);
     res.status(500).json({ message: "Failed to send message" });
   }
+};
+
+const sendChatBotMessage = async (data) => {
+  // console.log(data);
+  const genAI = new GoogleGenerativeAI(process.env.CHATBOT_API_KEY);
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+  const result = await model.generateContent(data.prompt);
+  console.log(result.response.text());
+  if (data.imageUrl) {
+    const message = await Message.create({
+      text: "Cant analyze image yet",
+      senderId: "67a5af796174659ba813c735",
+      receiverId: data.originalSenderId,
+    });
+    await message.save();
+
+    const receiverSocketId = getReceiverSocketId(data.originalSenderId);
+
+    if (data.originalSenderId) {
+      io.to(receiverSocketId).emit("newMessage", message);
+    }
+    return;
+  }
+  const message = await Message.create({
+    text: result.response.text(),
+    senderId: "67a5af796174659ba813c735",
+    receiverId: data.originalSenderId,
+    image: data.imageUrl,
+  });
+  await message.save();
+
+  const receiverSocketId = getReceiverSocketId(data.originalSenderId);
+
+  if (data.originalSenderId) {
+    io.to(receiverSocketId).emit("newMessage", message);
+  }
+  // res.status(201).json(message);
 };

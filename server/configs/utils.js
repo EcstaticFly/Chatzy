@@ -12,3 +12,16 @@ export const generateToken = async (userId, res) => {
   });
   return token;
 };
+
+export const generateChatbotToken = async (userId, res) => {
+  const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
+    expiresIn: "180d",
+  });
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    maxAge: 180 * 24 * 60 * 60 * 1000,
+  });
+  return token;
+};
