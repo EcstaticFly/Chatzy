@@ -3,6 +3,8 @@ import { chatStore } from "../store/chatStore";
 import { X, Image, Send, Loader } from "lucide-react";
 import {toast} from "react-toastify";
 
+const chatBotId = "67a5af796174659ba813c735"
+
 export const MessageInput = () => {
   const { sendMessage ,isSendingMessage } = chatStore();
   const {selectedUser} = chatStore(); 
@@ -81,7 +83,7 @@ export const MessageInput = () => {
               onChange={handleImageChange}
             />
           {
-            selectedUser._id !== "67a5af796174659ba813c735"
+            selectedUser._id !== chatBotId
             ? (
             <button
               type="button"

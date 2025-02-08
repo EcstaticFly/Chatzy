@@ -6,6 +6,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { config } from "dotenv";
 config();
 
+const chatBotId = "67a5af796174659ba813c735"
+
 export const getUsers = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
@@ -91,7 +93,7 @@ export const sendMessage = async (req, res) => {
     }
     // console.log("here");
     res.status(201).json(message);
-    if (receiverId === "67a5af796174659ba813c735") {
+    if (receiverId === chatBotId) {
       // console.log("here2");
       setTimeout(() => {
         sendChatBotMessage({
@@ -113,27 +115,12 @@ const sendChatBotMessage = async (data) => {
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const result = await model.generateContent(data.prompt);
-  console.log(result.response.text());
-  if (data.imageUrl) {
-    const message = await Message.create({
-      text: "Cant analyze image yet",
-      senderId: "67a5af796174659ba813c735",
-      receiverId: data.originalSenderId,
-    });
-    await message.save();
+  // console.log(result.response.text());
 
-    const receiverSocketId = getReceiverSocketId(data.originalSenderId);
-
-    if (data.originalSenderId) {
-      io.to(receiverSocketId).emit("newMessage", message);
-    }
-    return;
-  }
   const message = await Message.create({
     text: result.response.text(),
-    senderId: "67a5af796174659ba813c735",
+    senderId: chatBotId,
     receiverId: data.originalSenderId,
-    image: data.imageUrl,
   });
   await message.save();
 

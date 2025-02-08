@@ -3,6 +3,8 @@ import { chatStore } from "../store/chatStore.js";
 import { authStore } from "../store/authStore.js";
 import { useState } from "react";
 
+const chatBotId = "67a5af796174659ba813c735";
+
 export const ChatHeader = () => {
   const [openFullScreenImage, setOpenFullScreenImage] = useState(false);
   const { selectedUser, setSelectedUser } = chatStore();
@@ -24,7 +26,7 @@ export const ChatHeader = () => {
           <div>
             <h3 className="font-medium">{selectedUser?.fullName}</h3>
             <p className="text-sm text-base-content/70">
-              {onlineUsers.includes(selectedUser?._id) ? "Online" : "Offline"}
+              {onlineUsers.includes(selectedUser?._id) ? "Online" : selectedUser?._id === chatBotId ? "Online" : "Offline"}
             </p>
           </div>
         </div>

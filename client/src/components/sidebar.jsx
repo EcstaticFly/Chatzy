@@ -7,6 +7,8 @@ import { Search, X } from "lucide-react";
 import { toast } from "react-toastify";
 import SearchSkeleton from "./skeletons/searchSkeleton.jsx";
 
+const chatBotId = "67a5af796174659ba813c735"
+
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -98,7 +100,7 @@ export default function Sidebar() {
                 alt={user.name}
                 className="size-12 object-cover rounded-full"
               />
-              {onlineUsers.includes(user._id) && (
+              {(onlineUsers.includes(user._id) || user._id === chatBotId) && (
                 <span
                   className="absolute bottom-0 right-0 size-3 bg-green-500 
                   rounded-full ring-2 ring-zinc-900"
@@ -108,7 +110,7 @@ export default function Sidebar() {
             <div className="hidden lg:block text-left min-w-0">
               <div className="font-medium truncate">{user.fullName}</div>
               <div className="text-sm text-zinc-400">
-                {onlineUsers.includes(user._id) ? "Online" : "Offline"}
+                {onlineUsers.includes(user._id) ? "Online" : user._id === chatBotId ? "Online" : "Offline"}
               </div>
             </div>
           </button>

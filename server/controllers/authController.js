@@ -1,4 +1,4 @@
-import { generateChatbotToken, generateToken } from "../configs/utils.js";
+import { generateToken } from "../configs/utils.js";
 import User from "../models/user.js";
 import bcrypt from "bcryptjs";
 import randomstring from "randomstring";
@@ -24,11 +24,7 @@ export const loginUser = async (req, res) => {
       if (!isMatch) {
         return res.status(400).json({ message: "Invalid Credentials" });
       }
-      if (email.trim() === "suyash.2023ug1100@iiitranchi.ac.in") {
-        await generateChatbotToken(user._id, res);
-      } else {
-        await generateToken(user._id, res);
-      }
+      await generateToken(user._id, res);
       res.status(201).json({
         _id: user._id,
         email: user.email,
