@@ -93,7 +93,7 @@ export const sendMessage = async (req, res) => {
     }
 
     if (receiverId === chatBotId) {
-      await sendChatBotMessage({
+      sendChatBotMessage({
         originalSenderId: senderId,
         prompt: text,
         imageUrl: imageUrl || null,
