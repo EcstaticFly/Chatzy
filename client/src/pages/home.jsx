@@ -1,7 +1,7 @@
 import { chatStore } from "../store/chatStore.js";
 import Sidebar from '../components/sidebar.jsx'
 import NoChatSelected from '../components/noChatSelected.jsx';
-import ChatContainer from "../components/chatContainer.jsx";
+import ChatContainer from "../components/chat-container.jsx";
 
 export default function HomePage() {
   const {selectedUser} = chatStore();
