@@ -91,9 +91,9 @@ export const sendMessage = async (req, res) => {
     if (receiverId) {
       io.to(receiverSocketId).emit("newMessage", message);
     }
-    
+
     if (receiverId === chatBotId) {
-      sendChatBotMessage({
+      await sendChatBotMessage({
         originalSenderId: senderId,
         prompt: text,
         imageUrl: imageUrl || null,
