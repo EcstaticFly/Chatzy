@@ -6,7 +6,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { config } from "dotenv";
 config();
 
-const chatBotId = "67a5af796174659ba813c735"
+const chatBotId = "67a5af796174659ba813c735";
 
 export const getUsers = async (req, res) => {
   try {
@@ -91,18 +91,15 @@ export const sendMessage = async (req, res) => {
     if (receiverId) {
       io.to(receiverSocketId).emit("newMessage", message);
     }
-    // console.log("here");
-    res.status(201).json(message);
+    
     if (receiverId === chatBotId) {
-      // console.log("here2");
-      setTimeout(() => {
-        sendChatBotMessage({
-          originalSenderId: senderId,
-          prompt: text,
-          imageUrl: imageUrl || null,
-        });
-      }, 0);
+      sendChatBotMessage({
+        originalSenderId: senderId,
+        prompt: text,
+        imageUrl: imageUrl || null,
+      });
     }
+    res.status(201).json(message);
   } catch (e) {
     console.log(e.message);
     res.status(500).json({ message: "Failed to send message" });
