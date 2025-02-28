@@ -55,29 +55,18 @@ export default function ChatContainer() {
         {messages.map((message) => (
           <div
             key={message._id}
-            className={`chat ${
-              message?.senderId === user._id ? "chat-end" : "chat-start"
+            className={`flex ${
+              message?.senderId === user._id ? "justify-end" : "justify-start"
             }`}
             ref={messageEndRef}
           >
-            <div className="chat-image avatar">
-              <div className="size-10 rounded-full border">
-                <img
-                  src={
-                    message?.senderId === user._id
-                      ? user?.profilePic || "/avatar.png"
-                      : selectedUser?.profilePic || "/avatar.png"
-                  }
-                  alt="profile-pic"
-                />
-              </div>
-            </div>
-            <div className="chat-header mb-1">
-              <time className="text-xs opacity-50 ml-1">
-                {formatMessageTime(message?.createdAt)}
-              </time>
-            </div>
-            <div className="chat-bubble flex flex-col">
+            <div
+              className={`max-w-[80%] rounded-xl p-3 shadow-sm ${
+                message?.senderId === user._id
+                  ? "bg-primary text-primary-content"
+                  : "bg-base-200"
+              }`}
+            >
               {message?.image && (
                 <img
                   src={message?.image}
@@ -86,7 +75,16 @@ export default function ChatContainer() {
                   onClick={() => setSelectedImage(message)}
                 />
               )}
-              {message.text && <p>{message.text}</p>}
+              {message.text && <p className="text-sm">{message.text}</p>}
+              <p
+                className={`text-[10px] mt-1.5 ${
+                  message?.senderId === user._id
+                    ? "text-primary-content/70"
+                    : "text-base-content/70"
+                }`}
+              >
+                {formatMessageTime(message?.createdAt)}
+              </p>
             </div>
           </div>
         ))}

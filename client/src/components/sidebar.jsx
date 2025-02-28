@@ -61,7 +61,7 @@ export default function Sidebar() {
           <span className="font-medium hidden lg:block">Contacts</span>
           <button
             onClick={() => setIsSearchBoxOpen(true)}
-            className="flex items-center gap-2 px-2 py-2 rounded-lg shadow-sm hover:bg-secondary"
+            className="flex items-center gap-2 px-2 py-2 rounded-lg shadow-sm hover:bg-base-300"
           >
             <Search className="size-5" />
           </button>
@@ -137,7 +137,7 @@ export default function Sidebar() {
             }}
           />
 
-          <div className="relative w-96 h-full shadow-xl p-4 flex flex-col bg-primary bg-opacity-100">
+          <div className="relative w-96 h-full shadow-xl p-4 flex flex-col bg-base-200 bg-opacity-100">
             <form onSubmit={handleSubmit}>
               <button
                 type="button"
@@ -169,7 +169,7 @@ export default function Sidebar() {
                   {searchResults.map((item) => (
                     <div
                       key={item._id}
-                      className="flex items-center gap-3 p-4 border-b-2 last:border-none hover:cursor-pointer"
+                      className="flex rounded-lg items-center gap-3 p-4 border-b-2 last:border-none hover:cursor-pointer hover:bg-gradient-to-r from-primary/40 to-primary-content/40"
                       onClick={() => {
                         setSelectedUser(item);
                         setIsSearchBoxOpen(false);
@@ -185,6 +185,8 @@ export default function Sidebar() {
                         <div className={`text-sm`}>
                           {onlineUsers.includes(item._id)
                             ? "Online"
+                            : item._id === chatBotId
+                            ? "Online"
                             : "Offline"}
                         </div>
                       </div>
@@ -193,7 +195,7 @@ export default function Sidebar() {
                 </div>
               ) : (
                 <div className="text-center rounded-lg bg-opacity-100 py-4 flex items-center justify-center">
-                  <div className=" bg-secondary text-white rounded-lg w-64 text-center">
+                  <div className="bg-primary text-primary-content rounded-lg w-64 text-center">
                     No users found
                   </div>
                 </div>

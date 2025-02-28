@@ -1,13 +1,13 @@
 import { useRef, useState } from "react";
 import { chatStore } from "../store/chatStore";
 import { X, Image, Send, Loader } from "lucide-react";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 
-const chatBotId = "67a5af796174659ba813c735"
+const chatBotId = "67a5af796174659ba813c735";
 
 export const MessageInput = () => {
-  const { sendMessage ,isSendingMessage } = chatStore();
-  const {selectedUser} = chatStore(); 
+  const { sendMessage, isSendingMessage } = chatStore();
+  const { selectedUser } = chatStore();
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
@@ -76,15 +76,13 @@ export const MessageInput = () => {
             onChange={(event) => setText(event.target.value)}
           />
           <input
-              type="file"
-              className="hidden"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={handleImageChange}
-            />
-          {
-            selectedUser._id !== chatBotId
-            ? (
+            type="file"
+            className="hidden"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handleImageChange}
+          />
+          {selectedUser._id !== chatBotId ? (
             <button
               type="button"
               className={`hidden sm:flex btn btn-circle ${
@@ -93,18 +91,15 @@ export const MessageInput = () => {
               onClick={() => fileInputRef.current?.click()}
             >
               <Image size={20} />
-            </button> 
-            ) : null
-          }
+            </button>
+          ) : null}
         </div>
         <button
           type="submit"
-          className="btn btn-circle btn-sm"
+          className="btn btn-circle btn-sm btn-primary"
           disabled={(!text.trim() && !imagePreview) || isSendingMessage}
         >
-          {
-            isSendingMessage ? (<Loader size={22}/>):(<Send size={22} />)
-          }
+          {isSendingMessage ? <Loader size={22} /> : <Send size={22} />}
         </button>
       </form>
     </div>
