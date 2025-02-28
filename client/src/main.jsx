@@ -12,6 +12,8 @@ createRoot(document.getElementById("root")).render(
         position="top-center"
         hideProgressBar={true}
         autoClose={3000}
+        limit={1}
+        theme="colored"
         pauseOnHover={false}
         closeButton={false}
       />
