@@ -7,7 +7,7 @@ import { Search, X } from "lucide-react";
 import { toast } from "react-toastify";
 import SearchSkeleton from "./skeletons/searchSkeleton.jsx";
 
-const chatBotId = "67a5af796174659ba813c735"
+const chatBotId = "67a5af796174659ba813c735";
 
 export default function Sidebar() {
   const [isSearchBoxOpen, setIsSearchBoxOpen] = useState(false);
@@ -45,7 +45,9 @@ export default function Sidebar() {
     if (query.trim().length > 0) {
       await getSearchResults(query);
     } else {
-      toast.warning("Atleast one character needed", { position: "bottom-right" });
+      toast.warning("Atleast one character needed", {
+        position: "bottom-right",
+      });
     }
   };
 
@@ -75,7 +77,7 @@ export default function Sidebar() {
             <span className="text-sm hidden lg:flex">Show online only</span>
           </label>
           <span className="text-xs text-zinc-500 hidden lg:flex">
-            ({onlineUsers.length -1} online)
+            ({onlineUsers.length - 1} online)
           </span>
         </div>
       </div>
@@ -110,7 +112,11 @@ export default function Sidebar() {
             <div className="hidden lg:block text-left min-w-0">
               <div className="font-medium truncate">{user.fullName}</div>
               <div className="text-sm text-zinc-400">
-                {onlineUsers.includes(user._id) ? "Online" : user._id === chatBotId ? "Online" : "Offline"}
+                {onlineUsers.includes(user._id)
+                  ? "Online"
+                  : user._id === chatBotId
+                  ? "Online"
+                  : "Offline"}
               </div>
             </div>
           </button>
@@ -133,21 +139,18 @@ export default function Sidebar() {
 
           <div className="relative w-96 h-full shadow-xl p-4 flex flex-col bg-primary bg-opacity-100">
             <form onSubmit={handleSubmit}>
-            <button
-                  type="button"
-                  onClick={() => {
-                    setIsSearchBoxOpen(false);
-                    setQuery("");
-                    resetSearchResults();
-                  }}
-                  className="absolute top-5 right-5 p-2 rounded-full"
-                >
-                  <X className="size-5" />
-                </button>
               <button
-                type="submit"
-                className="absolute top-5 p-2 rounded-full"
+                type="button"
+                onClick={() => {
+                  setIsSearchBoxOpen(false);
+                  setQuery("");
+                  resetSearchResults();
+                }}
+                className="absolute top-5 right-5 p-2 rounded-full"
               >
+                <X className="size-5" />
+              </button>
+              <button type="submit" className="absolute top-5 p-2 rounded-full">
                 <Search className="size-5" />
               </button>
               <input
@@ -191,7 +194,7 @@ export default function Sidebar() {
               ) : (
                 <div className="text-center rounded-lg bg-opacity-100 py-4 flex items-center justify-center">
                   <div className=" bg-secondary text-white rounded-lg w-64 text-center">
-                  No users found
+                    No users found
                   </div>
                 </div>
               )}
