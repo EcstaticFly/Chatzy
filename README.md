@@ -50,13 +50,13 @@ CHATBOT_API_KEY=your_gemini_chatbot_api_key
 3️⃣ **Run Docker Command:**
 ```bash
 #To start Chatzy
-docker-compose up --build -d
+docker compose up --build -d
 
 #if already built once
-docker-compose up -d
+docker compose up -d
 
 #To stop Chatzy
-docker-compose down
+docker compose down
 ```
 
 4️⃣ **The app will be live at http://localhost:5173**
