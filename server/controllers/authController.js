@@ -107,6 +107,12 @@ export const updateProfilePic = async (req, res) => {
         .status(400)
         .json({ message: "Please provide a profile picture" });
     }
+    const existingUser = await User.findById({_id: userId});
+    if (existingUser?.profilePic) {
+      const publicId = extractPublicId(existingUser.profilePic);
+      // console.log(publicId);
+      const result = await cloudinary.uploader.destroy(publicId);
+    }
     let uploadImage = await cloudinary.uploader.upload(profilePic);
     const user = await User.findByIdAndUpdate(
       userId,
