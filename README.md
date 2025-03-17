@@ -67,3 +67,6 @@ Feel free to **fork** the repo and submit a **pull request**.
 
 ## 📜 License  
 This project is licensed under the **GNU GENERAL PUBLIC LICENSE v3**.
+
+## 📬 Contact
+For inquiries, reach out to me at [Suyash Pandey](mailto\:suyash.2023ug1100@iiitranchi.ac.in).
