@@ -75,7 +75,9 @@ export const sendMessage = async (req, res) => {
     const senderId = req.user._id;
     let imageUrl;
     if (image) {
-      const result = await cloudinary.uploader.upload(image);
+      const result = await cloudinary.uploader.upload(image, {
+        folder: "chatzy/messages",
+      });
       imageUrl = result.secure_url;
     }
     const message = await Message.create({

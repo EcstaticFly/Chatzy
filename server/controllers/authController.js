@@ -17,22 +17,21 @@ export const loginUser = async (req, res) => {
         .json({ message: "Please provide both email and password" });
     }
     const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(400).json({ message: "Invalid Credentials" });
-      }
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(400).json({ message: "Invalid Credentials" });
-      }
-      await generateToken(user._id, res);
-      res.status(201).json({
-        _id: user._id,
-        email: user.email,
-        fullName: user.fullName,
-        profilePic: user.profilePic,
-        message: "Logged in successfully",
-      });
-    
+    if (!user) {
+      return res.status(400).json({ message: "Invalid Credentials" });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid Credentials" });
+    }
+    await generateToken(user._id, res);
+    res.status(201).json({
+      _id: user._id,
+      email: user.email,
+      fullName: user.fullName,
+      profilePic: user.profilePic,
+      message: "Logged in successfully",
+    });
   } catch (e) {
     console.log(e.message);
     res.status(500).json({
@@ -107,13 +106,15 @@ export const updateProfilePic = async (req, res) => {
         .status(400)
         .json({ message: "Please provide a profile picture" });
     }
-    const existingUser = await User.findById({_id: userId});
+    const existingUser = await User.findById({ _id: userId });
     if (existingUser?.profilePic) {
       const publicId = extractPublicId(existingUser.profilePic);
       // console.log(publicId);
       const result = await cloudinary.uploader.destroy(publicId);
     }
-    let uploadImage = await cloudinary.uploader.upload(profilePic);
+    let uploadImage = await cloudinary.uploader.upload(profilePic, {
+      folder: "chatzy/profile_pictures",
+    });
     const user = await User.findByIdAndUpdate(
       userId,
       { profilePic: uploadImage.secure_url },
