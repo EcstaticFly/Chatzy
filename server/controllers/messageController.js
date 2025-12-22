@@ -2,7 +2,7 @@ import { getReceiverSocketId, io } from "../configs/socket.js";
 import Message from "../models/message.js";
 import User from "../models/user.js";
 import { v2 as cloudinary } from "cloudinary";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import { config } from "dotenv";
 config();
 
@@ -109,24 +109,43 @@ export const sendMessage = async (req, res) => {
 };
 
 const sendChatBotMessage = async (data) => {
-  // console.log(data);
-  const genAI = new GoogleGenerativeAI(process.env.CHATBOT_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  try {
+    const genAI = new GoogleGenAI({apiKey: process.env.CHATBOT_API_KEY});
 
-  const result = await model.generateContent(data.prompt);
-  // console.log(result.response.text());
+    const result = await genAI.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: data.prompt,
+    });
+    
+    const message = await Message.create({
+      text: result.text,
+      senderId: chatBotId,
+      receiverId: data.originalSenderId,
+    });
+    await message.save();
 
-  const message = await Message.create({
-    text: result.response.text(),
-    senderId: chatBotId,
-    receiverId: data.originalSenderId,
-  });
-  await message.save();
+    const receiverSocketId = getReceiverSocketId(data.originalSenderId);
 
-  const receiverSocketId = getReceiverSocketId(data.originalSenderId);
+    if (data.originalSenderId) {
+      io.to(receiverSocketId).emit("newMessage", message);
+    }
+  } catch (error) {
+    console.error("ChatBot Error:", error.message);
+    
+    try {
+      const errorMessage = await Message.create({
+        text: "I'm currently unavailable due to high demand. Please try again in a few minutes.",
+        senderId: chatBotId,
+        receiverId: data.originalSenderId,
+      });
+      await errorMessage.save();
 
-  if (data.originalSenderId) {
-    io.to(receiverSocketId).emit("newMessage", message);
+      const receiverSocketId = getReceiverSocketId(data.originalSenderId);
+      if (data.originalSenderId) {
+        io.to(receiverSocketId).emit("newMessage", errorMessage);
+      }
+    } catch (dbError) {
+      console.error("Failed to save error message:", dbError.message);
+    }
   }
-  // res.status(201).json(message);
 };

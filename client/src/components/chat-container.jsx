@@ -6,6 +6,7 @@ import { MessageSkeleton } from "./skeletons/messageSkeleton.jsx";
 import { authStore } from "../store/authStore.js";
 import { formatMessageTime } from "../configs/utils.js";
 import { X } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 export default function ChatContainer() {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -75,7 +76,11 @@ export default function ChatContainer() {
                   onClick={() => setSelectedImage(message)}
                 />
               )}
-              {message.text && <p className="text-sm">{message.text}</p>}
+              {message.text && (
+                <div className="text-sm prose prose-sm max-w-none">
+                  <ReactMarkdown>{message.text}</ReactMarkdown>
+                </div>
+              )}
               <p
                 className={`text-[10px] mt-1.5 ${
                   message?.senderId === user._id
