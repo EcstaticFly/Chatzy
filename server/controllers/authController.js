@@ -30,6 +30,7 @@ export const loginUser = async (req, res) => {
       email: user.email,
       fullName: user.fullName,
       profilePic: user.profilePic,
+      createdAt: user.createdAt,
       message: "Logged in successfully",
     });
   } catch (e) {
@@ -71,6 +72,7 @@ export const registerUser = async (req, res) => {
         email: newUser.email,
         fullName: newUser.fullName,
         profilePic: newUser.profilePic,
+        createdAt: newUser.createdAt,
         message: "Account created successfully",
       });
     } else {
