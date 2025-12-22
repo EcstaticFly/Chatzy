@@ -178,14 +178,16 @@ function generateOtp() {
 async function sendOtp(email, otp) {
   try {
     const mailOptions = {
-      from: "otp.shopex@gmail.com",
+      from: process.env.MAIL_USER,
       to: email,
       subject: "Otp verification",
       text: `Your Shopex Otp for verification is ${otp}. DO NOT share it with anyone.`,
     };
     // console.log("h1");
     const transporter = nodemailer.createTransport({
-      service: "Gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
       auth: {
         user: process.env.MAIL_USER,
         pass: process.env.SECRET_PASSWORD,
@@ -196,11 +198,8 @@ async function sendOtp(email, otp) {
     });
     // console.log("h2");
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) console.log("Error occured: ", error.message);
-      else console.log("OTP sent successfully: ", info.response);
-    });
-    // console.log("h3");
+    const info = await transporter.sendMail(mailOptions);
+    console.log("OTP sent successfully:", info.response);
     return true;
   } catch (e) {
     console.log("Otp sending fail.");
@@ -211,10 +210,14 @@ async function sendOtp(email, otp) {
 export const getOtp = async (req, res) => {
   try {
     const { email } = req.body;
+    console.log("Getting OTP for email:", email);
+    console.log("MAIL_USER set:", !!process.env.MAIL_USER);
+    console.log("SECRET_PASSWORD set:", !!process.env.SECRET_PASSWORD);
     const otp = generateOtp();
     otpCache[email] = await bcrypt.hash(otp, 10);
 
     const result = await sendOtp(email, otp);
+    console.log("Send OTP result:", result);
     // console.log(email, otp);
     if (result) {
       res.cookie("otpCache", otpCache, {
