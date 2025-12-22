@@ -2,7 +2,7 @@ import { generateToken } from "../configs/utils.js";
 import User from "../models/user.js";
 import bcrypt from "bcryptjs";
 import randomstring from "randomstring";
-import nodemailer from "nodemailer";
+import * as brevo from '@getbrevo/brevo';
 import { v2 as cloudinary } from "cloudinary";
 import { extractPublicId } from "cloudinary-build-url";
 import dotenv, { config } from "dotenv";
@@ -177,32 +177,29 @@ function generateOtp() {
 
 async function sendOtp(email, otp) {
   try {
-    const mailOptions = {
-      from: process.env.MAIL_USER,
-      to: email,
-      subject: "Otp verification",
-      text: `Your Shopex Otp for verification is ${otp}. DO NOT share it with anyone.`,
-    };
-    // console.log("h1");
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.SECRET_PASSWORD,
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
-    // console.log("h2");
+    const apiInstance = new brevo.TransactionalEmailsApi();
+    apiInstance.setApiKey(
+      brevo.TransactionalEmailsApiApiKeys.apiKey,
+      process.env.BREVO_API_KEY
+    );
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log("OTP sent successfully:", info.response);
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    sendSmtpEmail.subject = "OTP Verification";
+    sendSmtpEmail.to = [{ email: email }];
+    sendSmtpEmail.sender = { 
+      name: "OTP Authentication", 
+      email: process.env.MAIL_USER 
+    };
+    sendSmtpEmail.textContent = `Your OTP for verification is ${otp}. DO NOT share it with anyone.`;
+
+    const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log('OTP sent successfully via Brevo:', result?.body?.messageId);
     return true;
-  } catch (e) {
-    console.log("Otp sending fail.", e);
+  } catch (error) {
+    console.error('Brevo OTP sending failed:', error.message);
+    if (error.response) {
+      console.error('Brevo error details:', error.response.body);
+    }
     return false;
   }
 }
@@ -211,26 +208,28 @@ export const getOtp = async (req, res) => {
   try {
     const { email } = req.body;
     console.log("Getting OTP for email:", email);
+    console.log("BREVO_API_KEY set:", !!process.env.BREVO_API_KEY);
     console.log("MAIL_USER set:", !!process.env.MAIL_USER);
-    console.log("SECRET_PASSWORD set:", !!process.env.SECRET_PASSWORD);
+    
     const otp = generateOtp();
     otpCache[email] = await bcrypt.hash(otp, 10);
 
     const result = await sendOtp(email, otp);
     console.log("Send OTP result:", result);
-    // console.log(email, otp);
+    
     if (result) {
       res.cookie("otpCache", otpCache, {
         maxAge: 300000,
         httpOnly: true,
-        secure: false,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       });
-      res.status(200).json({ message: "OTP sent succesfully" });
+      res.status(200).json({ message: "OTP sent successfully" });
     } else {
       res.status(400).json({ message: "Failed to send OTP." });
     }
   } catch (e) {
-    console.log(e);
+    console.error("Error in getOtp:", e);
     res.status(500).json({
       message: "Internal server error",
     });
@@ -240,16 +239,18 @@ export const getOtp = async (req, res) => {
 export const verifyOtp = async (req, res) => {
   const { formData, givenOTP } = req.body;
   const actualOTPCache = req.cookies.otpCache;
-  const decodedOtp = await bcrypt.compare(
-    givenOTP.trim(),
-    actualOTPCache[formData.email]
-  );
+  
   if (!actualOTPCache) {
     return res.status(400).json({ message: "OTP expired." });
   }
   if (!actualOTPCache.hasOwnProperty(formData.email)) {
-    return res.status(400).json({ message: "Email not found,try again" });
+    return res.status(400).json({ message: "Email not found, try again" });
   }
+  
+  const decodedOtp = await bcrypt.compare(
+    givenOTP.trim(),
+    actualOTPCache[formData.email]
+  );
 
   if (decodedOtp) {
     delete otpCache[formData.email];
