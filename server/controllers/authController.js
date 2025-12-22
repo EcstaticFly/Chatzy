@@ -202,7 +202,7 @@ async function sendOtp(email, otp) {
     console.log("OTP sent successfully:", info.response);
     return true;
   } catch (e) {
-    console.log("Otp sending fail.");
+    console.log("Otp sending fail.", e);
     return false;
   }
 }
