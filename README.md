@@ -16,12 +16,12 @@ Chatzy is a **real-time chat platform** that enables users to **send messages, s
 
 ## 🛠 Tech Stack  
 - **Frontend:** React.js, TailwindCSS, Daisy UI  
-- **Backend:** Node.js, Express.js, MongoDB  
+- **Backend:** Node.js, Express.js, MongoDB, Brevo-api    
 - **Real-Time Communication:** Socket.io  
 - **Authentication:** OTP Verification  
 - **AI Integration:** Gemini API  
 - **Media Management:** Cloudinary  
-- **Deployment:** Docker  
+- **Deployment:** Docker, Render    
 
 ## 🚀 Installation & Setup  
 1️⃣ **Clone the repository:**  
@@ -38,12 +38,12 @@ touch .env
 MONGODB_URL=your_mongodb_url
 CORS_ORIGIN=your_cors_origin
 JWT_SECRET=your_jwt_secret
-NODE_ENV = development
+NODE_ENV=development
 CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
 CLOUDINARY_API_KEY=your_cloudinary_api_key
 CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 MAIL_USER=your_mail_to_send_otp
-SECRET_PASSWORD=app_password_for_mail
+BREVO_API_KEY=your_brevo_api_key
 CHATBOT_API_KEY=your_gemini_chatbot_api_key
 ```
 
