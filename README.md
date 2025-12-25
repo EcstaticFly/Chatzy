@@ -177,9 +177,7 @@ docker compose down -v
 
 ### Setup Steps
 
-**1. Copy Production Compose File (docker-compose.prod.yaml):**
-
-Copy from here: [https://gist.github.com/EcstaticFly/1ec0a944465c98a5f0f28b8cff04a940](https://gist.github.com/EcstaticFly/1ec0a944465c98a5f0f28b8cff04a940)
+**1. Download Production Compose File (docker-compose.prod.yaml):** [Download](https://github.com/EcstaticFly/Chatzy/blob/main/docker-compose.prod.yaml)
 
 ```bash
 # Create a directory
