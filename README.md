@@ -4,7 +4,7 @@ Chatzy is a **real-time chat platform** that enables users to **send messages, s
 
 🔗 **Live Demo:** [Chatzy](https://chatzy-mxp8.onrender.com/)  
 📂 **Source Code:** [GitHub](https://github.com/EcstaticFly/Chatzy.git)  
-🐳 **Docker Hub:** [suyash310/chatzy](https://hub.docker.com/u/suyash310)
+🐳 **Docker Hub:** [suyash310](https://hub.docker.com/u/suyash310)
 
 ## ✨ Features  
 - **💬 Real-Time Messaging** – Instant text & image sharing via **Socket.io**.  
