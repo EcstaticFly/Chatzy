@@ -64,21 +64,24 @@ export const chatStore = create((set, get) => ({
     }
   },
 
-  sendMessage: async (messageData) => {
+  sendMessage: async (formData) => {
     set({ isSendingMessage: true });
     const { selectedUser, messages } = get();
     // console.log(selectedUser);
     try {
-      const response = await axiosInstance.post(
+      const res = await axiosInstance.post(
         `/messages/send/${selectedUser._id}`,
-        messageData
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
-      set({ messages: [...messages, response.data] });
-    } catch (e) {
-      console.log(e);
-      toast.error(
-        e.response.data.message || "File size should be less than 5mb"
-      );
+      set({ messages: [...messages, res.data] });
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error(error.response?.data?.message || "Failed to send message");
     } finally {
       set({ isSendingMessage: false });
     }

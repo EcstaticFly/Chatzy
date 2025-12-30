@@ -4,9 +4,26 @@ import User from "../models/user.js";
 import { v2 as cloudinary } from "cloudinary";
 import { GoogleGenAI } from "@google/genai";
 import { config } from "dotenv";
+import streamifier from "streamifier";
 config();
 
 const chatBotId = "67a5af796174659ba813c735";
+
+const uploadToCloudinary = (buffer, folder, resourceType = "auto") => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: folder,
+        resource_type: resourceType,
+      },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    streamifier.createReadStream(buffer).pipe(uploadStream);
+  });
+};
 
 export const getUsers = async (req, res) => {
   try {
@@ -69,22 +86,48 @@ export const getMessages = async (req, res) => {
 
 export const sendMessage = async (req, res) => {
   try {
-    const { text, image } = req.body;
+    const { text } = req.body;
     const { id: receiverId } = req.params;
-    // console.log(receiverId);
     const senderId = req.user._id;
+
     let imageUrl;
-    if (image) {
-      const result = await cloudinary.uploader.upload(image, {
-        folder: "chatzy/messages",
-      });
+    let documentData;
+
+    // Handle image upload
+    if (req.files && req.files.image) {
+      const imageFile = req.files.image[0];
+      const result = await uploadToCloudinary(
+        imageFile.buffer,
+        "chatzy/messages/images",
+        "image"
+      );
       imageUrl = result.secure_url;
     }
+
+    // Handle document upload
+    if (req.files && req.files.document) {
+      const docFile = req.files.document[0];
+      const result = await uploadToCloudinary(
+        docFile.buffer,
+        "chatzy/messages/documents",
+      );
+
+      // console.log("Uploaded document:", docFile.originalname);
+
+      documentData = {
+        url: result.secure_url,
+        name: docFile.originalname,
+        size: docFile.size,
+        type: docFile.mimetype,
+      };
+    }
+
     const message = await Message.create({
       text,
       senderId,
       receiverId,
       image: imageUrl,
+      document: documentData,
     });
     await message.save();
 
@@ -104,7 +147,7 @@ export const sendMessage = async (req, res) => {
     res.status(201).json(message);
   } catch (e) {
     console.log(e.message);
-    res.status(500).json({ message: "Failed to send message" });
+    res.status(500).json({ message: e?.message || "Failed to send message" });
   }
 };
 

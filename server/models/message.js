@@ -1,5 +1,27 @@
 import mongoose, { Types } from "mongoose";
 
+const documentSchema = new mongoose.Schema(
+  {
+    url: {
+      type: String,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    size: {
+      type: Number,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+    },
+  },
+  { _id: false }
+);
+
 const messageSchema = new mongoose.Schema(
   {
     senderId: {
@@ -17,6 +39,10 @@ const messageSchema = new mongoose.Schema(
     },
     image: {
       type: String,
+    },
+    document: {
+      type: documentSchema,
+      required: false,
     },
   },
   {
