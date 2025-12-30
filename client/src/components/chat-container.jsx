@@ -5,7 +5,7 @@ import { MessageInput } from "./messageInput.jsx";
 import { MessageSkeleton } from "./skeletons/messageSkeleton.jsx";
 import { authStore } from "../store/authStore.js";
 import { formatMessageTime } from "../configs/utils.js";
-import { X } from "lucide-react";
+import { X, FileText, Download, ArrowUpRightFromSquare } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 export default function ChatContainer() {
@@ -37,6 +37,22 @@ export default function ChatContainer() {
     if (messageEndRef.current && messages)
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const handleDocumentClick = (e, url) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (url) {
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const formatFileSize = (bytes) => {
+    if (!bytes || bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
+  };
 
   if (isChatLoading) {
     return (
@@ -76,6 +92,33 @@ export default function ChatContainer() {
                   onClick={() => setSelectedImage(message)}
                 />
               )}
+
+              {message?.document && (
+                <div
+                  className={`flex items-center gap-3 p-3 rounded-lg mb-2 cursor-pointer transition-colors ${
+                    message?.senderId === user._id
+                      ? "bg-primary-content/10 hover:bg-primary-content/20"
+                      : "bg-base-300 hover:bg-base-300/80"
+                  }`}
+                  onClick={(e) => handleDocumentClick(e, message.document.url)}
+                >
+                  <div className="flex-shrink-0">
+                    <FileText size={32} className="text-blue-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm truncate">
+                      {message.document.name || "Document"}
+                    </p>
+                    <p className="text-xs opacity-70">
+                      {formatFileSize(message.document.size)}
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0">
+                    <ArrowUpRightFromSquare size={20} className="opacity-70" />
+                  </div>
+                </div>
+              )}
+
               {message.text && (
                 <div className="text-sm prose prose-sm max-w-none">
                   <ReactMarkdown>{message.text}</ReactMarkdown>
