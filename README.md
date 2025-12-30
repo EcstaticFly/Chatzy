@@ -1,6 +1,6 @@
 # 🚀 Chatzy – Real-Time Chat Application  
 
-Chatzy is a **real-time chat platform** that enables users to **send messages, share images, and engage with an AI-powered chatbot**. Built with the **MERN stack, Socket.io, and Docker**, it offers **secure OTP authentication, user search, online status filtering, and customizable themes (32+ options)** for a seamless experience.  
+Chatzy is a **real-time chat platform** that enables users to **send messages, share images & PDFs, and engage with an AI-powered chatbot**. Built with the **MERN stack, Socket.io, and Docker**, it offers **secure OTP authentication, user search, online status filtering, and customizable themes (32+ options)** for a seamless experience.  
 
 🔗 **Live Demo:** [Chatzy](https://chatzy-mxp8.onrender.com/)  
 📂 **Source Code:** [GitHub](https://github.com/EcstaticFly/Chatzy.git)  
@@ -34,7 +34,7 @@ Choose one of the following methods based on your needs:
 - **Node.js** (v18 or higher) - Required for Method 1
 - **Docker & Docker Compose** - Required for Methods 2 & 3
 - **MongoDB** - Local installation or MongoDB Atlas account
-- **Cloudinary Account** - For image uploads
+- **Cloudinary Account** - For image & PDF uploads
 - **Brevo Account** - For OTP email delivery
 - **Google Gemini API Key** - For AI chatbot
 

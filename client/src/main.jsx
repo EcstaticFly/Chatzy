@@ -36,6 +36,6 @@ createRoot(document.getElementById("root")).render(
 // 5. Group chats.
 // 6. Voice messaging capabilities.
 // 7. Message editing and deletion options for users(under certain time frame).
-// 8. File sharing capabilities (documents, PDFs, etc.) in addition to images.
+// 8. ✅ File sharing capabilities (PDFs) in addition to images. (cloudinary only supports images and pdfs)
 // 9. {Have no idea of this field, that's why i won't call it ultimate, rather optional} AI-powered chatbots for automated responses and assistance.
 // ULTIMATE: Implement end-to-end encryption for messages to enhance privacy and security.
