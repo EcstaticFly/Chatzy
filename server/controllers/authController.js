@@ -2,7 +2,7 @@ import { generateToken } from "../configs/utils.js";
 import User from "../models/user.js";
 import bcrypt from "bcryptjs";
 import randomstring from "randomstring";
-import * as brevo from '@getbrevo/brevo';
+import * as brevo from "@getbrevo/brevo";
 import { v2 as cloudinary } from "cloudinary";
 import { extractPublicId } from "cloudinary-build-url";
 import dotenv, { config } from "dotenv";
@@ -103,29 +103,36 @@ export const updateProfilePic = async (req, res) => {
   try {
     const userId = req.user._id;
     const { profilePic } = req.body;
+
     if (!profilePic) {
       return res
         .status(400)
         .json({ message: "Please provide a profile picture" });
     }
+
     const existingUser = await User.findById({ _id: userId });
+
     if (existingUser?.profilePic) {
       const publicId = extractPublicId(existingUser.profilePic);
       // console.log(publicId);
       const result = await cloudinary.uploader.destroy(publicId);
     }
+
     let uploadImage = await cloudinary.uploader.upload(profilePic, {
       folder: "chatzy/profile_pictures",
     });
+
     const user = await User.findByIdAndUpdate(
       userId,
       { profilePic: uploadImage.secure_url },
       { new: true }
     );
+
     await user.save();
     res
       .status(200)
       .json({ user, message: "Profile Picture Updated Successfully!" });
+
   } catch (e) {
     console.log(e.message);
     res.status(500).json({
@@ -139,19 +146,24 @@ export const deleteProfilePic = async (req, res) => {
     if (!req.user.profilePic) {
       return res.status(400).json({ message: "No profile picture to delete" });
     }
+
     const publicId = extractPublicId(req.user.profilePic);
     // console.log(publicId);
+
     const result = await cloudinary.uploader.destroy(publicId);
     const userId = req.user._id;
+
     const user = await User.findByIdAndUpdate(
       userId,
       { profilePic: "" },
       { new: true }
     );
+
     await user.save();
     res
       .status(200)
       .json({ user, message: "Profile Picture Deleted Successfully!" });
+
   } catch (e) {
     console.log(e.message);
     res.status(500).json({
@@ -188,19 +200,19 @@ async function sendOtp(email, otp) {
     const sendSmtpEmail = new brevo.SendSmtpEmail();
     sendSmtpEmail.subject = "OTP Verification";
     sendSmtpEmail.to = [{ email: email }];
-    sendSmtpEmail.sender = { 
-      name: "OTP Authentication", 
-      email: process.env.MAIL_USER 
+    sendSmtpEmail.sender = {
+      name: "OTP Authentication",
+      email: process.env.MAIL_USER,
     };
     sendSmtpEmail.textContent = `Your OTP for verification is ${otp}. DO NOT share it with anyone.`;
 
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log('OTP sent successfully via Brevo:', result?.body?.messageId);
+    console.log("OTP sent successfully via Brevo:", result?.body?.messageId);
     return true;
   } catch (error) {
-    console.error('Brevo OTP sending failed:', error.message);
+    console.error("Brevo OTP sending failed:", error.message);
     if (error.response) {
-      console.error('Brevo error details:', error.response.body);
+      console.error("Brevo error details:", error.response.body);
     }
     return false;
   }
@@ -212,13 +224,13 @@ export const getOtp = async (req, res) => {
     console.log("Getting OTP for email:", email);
     console.log("BREVO_API_KEY set:", !!process.env.BREVO_API_KEY);
     console.log("MAIL_USER set:", !!process.env.MAIL_USER);
-    
+
     const otp = generateOtp();
     otpCache[email] = await bcrypt.hash(otp, 10);
 
     const result = await sendOtp(email, otp);
     console.log("Send OTP result:", result);
-    
+
     if (result) {
       res.cookie("otpCache", otpCache, {
         maxAge: 300000,
@@ -241,14 +253,14 @@ export const getOtp = async (req, res) => {
 export const verifyOtp = async (req, res) => {
   const { formData, givenOTP } = req.body;
   const actualOTPCache = req.cookies.otpCache;
-  
+
   if (!actualOTPCache) {
     return res.status(400).json({ message: "OTP expired." });
   }
   if (!actualOTPCache.hasOwnProperty(formData.email)) {
     return res.status(400).json({ message: "Email not found, try again" });
   }
-  
+
   const decodedOtp = await bcrypt.compare(
     givenOTP.trim(),
     actualOTPCache[formData.email]

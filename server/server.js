@@ -8,6 +8,8 @@ import connectCloudinary from "./configs/cloudinary.js";
 import authRoutes from "./routes/authRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import { app, server } from "./configs/socket.js";
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './configs/swagger.js';
 
 import path from "path"
 
@@ -37,8 +39,11 @@ app.use(cookieParser());
 app.use(express.json({limit:"7mb"}));
 app.use(express.urlencoded({limit:"7mb", extended:true}));
 
+app.get("/api/",(req,res)=> res.send("Welcome to the Chatzy API"));
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 if(process.env.NODE_ENV === "production"){
   console.log("Production mode");
