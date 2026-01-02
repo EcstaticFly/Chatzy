@@ -87,6 +87,36 @@ export const chatStore = create((set, get) => ({
     }
   },
 
+  markMessagesAsSeen: (senderId) => {
+    const socket = authStore.getState().socket;
+    if (socket) {
+      socket.emit("markMessagesAsSeen", { senderId });
+    }
+  },
+
+  listenMessagesSeen: () => {
+    const socket = authStore.getState().socket;
+
+    socket.on("messagesSeen", ({ seenBy, seenAt }) => {
+      const { messages, selectedUser } = get();
+
+      if (selectedUser?._id === seenBy) {
+        const updatedMessages = messages.map((msg) => {
+          if (msg.senderId === authStore.getState().user._id && !msg.seenAt) {
+            return { ...msg, seenAt };
+          }
+          return msg;
+        });
+        set({ messages: updatedMessages });
+      }
+    });
+  },
+
+  stopListenMessagesSeen: () => {
+    const socket = authStore.getState().socket;
+    socket.off("messagesSeen");
+  },
+
   listenIncomingMessage: () => {
     const { selectedUser } = get();
     if (!selectedUser) return;
@@ -95,11 +125,14 @@ export const chatStore = create((set, get) => ({
     socket.on("newMessage", (message) => {
       if (message.senderId !== selectedUser._id) return;
       set({ messages: [...get().messages, message] });
+      get().markMessagesAsSeen(selectedUser._id);
     });
+    get().listenMessagesSeen();
   },
 
   stopListenIncomingMessage: () => {
     const socket = authStore.getState().socket;
     socket.off("newMessage");
+    get().stopListenMessagesSeen();
   },
 }));
