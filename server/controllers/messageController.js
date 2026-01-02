@@ -68,19 +68,39 @@ export const searchUser = async (req, res) => {
 
 export const getMessages = async (req, res) => {
   try {
-    const { id } = req.params;
-    const currentUserId = req.user._id;
+    const { id: userToChatId } = req.params;
+    const myId = req.user._id;
+
     const messages = await Message.find({
       $or: [
-        { senderId: currentUserId, receiverId: id },
-        { senderId: id, receiverId: currentUserId },
+        { senderId: myId, receiverId: userToChatId },
+        { senderId: userToChatId, receiverId: myId },
       ],
     });
 
+    await Message.updateMany(
+      {
+        senderId: userToChatId,
+        receiverId: myId,
+        seenAt: null,
+      },
+      {
+        seenAt: new Date(),
+      }
+    );
+
+    const senderSocketId = getReceiverSocketId(userToChatId);
+    if (senderSocketId) {
+      io.to(senderSocketId).emit("messagesSeen", {
+        seenBy: myId,
+        seenAt: new Date(),
+      });
+    }
+
     res.status(200).json(messages);
-  } catch (e) {
-    console.log(e.message);
-    res.status(500).json({ message: "Failed to fetch messages" });
+  } catch (error) {
+    console.log("Error in getMessages controller: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -109,7 +129,7 @@ export const sendMessage = async (req, res) => {
       const docFile = req.files.document[0];
       const result = await uploadToCloudinary(
         docFile.buffer,
-        "chatzy/messages/documents",
+        "chatzy/messages/documents"
       );
 
       // console.log("Uploaded document:", docFile.originalname);
@@ -128,6 +148,7 @@ export const sendMessage = async (req, res) => {
       receiverId,
       image: imageUrl,
       document: documentData,
+      seenAt: null,
     });
     await message.save();
 
@@ -153,13 +174,13 @@ export const sendMessage = async (req, res) => {
 
 const sendChatBotMessage = async (data) => {
   try {
-    const genAI = new GoogleGenAI({apiKey: process.env.CHATBOT_API_KEY});
+    const genAI = new GoogleGenAI({ apiKey: process.env.CHATBOT_API_KEY });
 
     const result = await genAI.models.generateContent({
       model: "gemini-2.5-flash",
       contents: data.prompt,
     });
-    
+
     const message = await Message.create({
       text: result.text,
       senderId: chatBotId,
@@ -174,7 +195,7 @@ const sendChatBotMessage = async (data) => {
     }
   } catch (error) {
     console.error("ChatBot Error:", error.message);
-    
+
     try {
       const errorMessage = await Message.create({
         text: "I'm currently unavailable due to high demand. Please try again in a few minutes.",

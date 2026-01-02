@@ -5,7 +5,7 @@ import { MessageInput } from "./messageInput.jsx";
 import { MessageSkeleton } from "./skeletons/messageSkeleton.jsx";
 import { authStore } from "../store/authStore.js";
 import { formatMessageTime } from "../configs/utils.js";
-import { X, FileText, Download, ArrowUpRightFromSquare } from "lucide-react";
+import { X, FileText, ArrowUpRightFromSquare } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 export default function ChatContainer() {
@@ -17,6 +17,7 @@ export default function ChatContainer() {
     isChatLoading,
     listenIncomingMessage,
     stopListenIncomingMessage,
+    markMessagesAsSeen,
   } = chatStore();
   const { user } = authStore();
 
@@ -25,12 +26,14 @@ export default function ChatContainer() {
   useEffect(() => {
     getMessages(selectedUser._id);
     listenIncomingMessage();
+    markMessagesAsSeen(selectedUser._id);
     return () => stopListenIncomingMessage();
   }, [
     getMessages,
     selectedUser._id,
     listenIncomingMessage,
     stopListenIncomingMessage,
+    markMessagesAsSeen,
   ]);
 
   useEffect(() => {
@@ -124,15 +127,34 @@ export default function ChatContainer() {
                   <ReactMarkdown>{message.text}</ReactMarkdown>
                 </div>
               )}
-              <p
-                className={`text-[10px] mt-1.5 ${
-                  message?.senderId === user._id
-                    ? "text-primary-content/70"
-                    : "text-base-content/70"
-                }`}
-              >
-                {formatMessageTime(message?.createdAt)}
-              </p>
+
+              <div className="flex items-center justify-end gap-1">
+                <p
+                  className={`text-[10px] ${
+                    message?.senderId === user._id
+                      ? "text-primary-content/70"
+                      : "text-base-content/70"
+                  }`}
+                >
+                  {formatMessageTime(message?.createdAt)}
+                </p>
+
+                {/* Show seen status for sent messages */}
+                {message?.senderId === user._id && (
+                  <span className="text-[10px]">
+                    {message.seenAt ? (
+                      <span
+                        className="text-blue-600"
+                        title={`Seen ${formatMessageTime(message.seenAt)}`}
+                      >
+                        ✓✓
+                      </span>
+                    ) : (
+                      <span className="text-primary-content/50">✓</span>
+                    )}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         ))}
